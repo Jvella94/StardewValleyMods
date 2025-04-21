@@ -132,7 +132,7 @@ namespace GenericModConfigMenu
         /// <inheritdoc />
         public override object GetApi(IModInfo mod)
         {
-            return new Api(mod.Manifest, this.ConfigManager, mod => this.OpenModMenu(mod, page: null, listScrollRow: null), mod => this.OpenModMenuNew(mod, page: null, listScrollRow: null), (s) => LogDeprecated( mod.Manifest.UniqueID, s));
+            return new Api(mod.Manifest, this.ConfigManager, mod => this.OpenModMenu(mod, page: null, listScrollRow: null), mod => this.OpenModMenuNew(mod, page: null, listScrollRow: null), (s) => LogDeprecated(mod.Manifest.UniqueID, s));
         }
 
 
@@ -152,7 +152,8 @@ namespace GenericModConfigMenu
         /// <param name="scrollRow">The initial scroll position, represented by the row index at the top of the visible area.</param>
         private void OpenListMenuNew(int? scrollRow = null)
         {
-            Mod.ActiveConfigMenu = new ModConfigMenu(this.Config.ScrollSpeed, openModMenu: (mod, curScrollRow) => this.OpenModMenuNew(mod, page: null, listScrollRow: curScrollRow), openKeybindingsMenu: currScrollRow => OpenKeybindingsMenuNew( currScrollRow ), this.ConfigManager, this.Helper.GameContent.Load<Texture2D>(AssetManager.KeyboardButton), scrollRow);
+            Mod.ActiveConfigMenu = new ModConfigMenu(this.Config.ScrollSpeed, openModMenu: (mod, curScrollRow) => this.OpenModMenuNew(mod, page: null, listScrollRow: curScrollRow), openKeybindingsMenu: currScrollRow => OpenKeybindingsMenuNew(currScrollRow),
+                this.ConfigManager, this.Helper.GameContent.Load<Texture2D>(AssetManager.KeyboardButton), scrollRow, Config.SearchBarAutoFocus, Config.FilterOffsetX, Config.FilterOffsetY);
         }
         private void OpenListMenu(int? scrollRow = null)
         {
@@ -192,7 +193,7 @@ namespace GenericModConfigMenu
                     OpenListMenuNew(listScrollRow);
                 }
             );
-            
+
             if (Game1.activeClickableMenu is TitleMenu)
             {
                 TitleMenu.subMenu = newMenu;
@@ -217,7 +218,7 @@ namespace GenericModConfigMenu
                 page: page,
                 openPage: newPage =>
                 {
-                    if (!(Game1.activeClickableMenu is TitleMenu))
+                    if (Game1.activeClickableMenu is not TitleMenu)
                         Mod.ActiveConfigMenu = null;
                     this.OpenModMenuNew(mod, newPage, listScrollRow);
                 },
@@ -275,7 +276,7 @@ namespace GenericModConfigMenu
                 this.Ui.AddChild(this.ConfigButton);
             }
 
-            if (Game1.activeClickableMenu is TitleMenu tm && tm.allClickableComponents?.Find( (cc) => cc?.myID == 509800 ) == null )
+            if (Game1.activeClickableMenu is TitleMenu tm && tm.allClickableComponents?.Find((cc) => cc?.myID == 509800) == null)
             {
                 // Gamepad support
                 Texture2D tex = this.Helper.GameContent.Load<Texture2D>(AssetManager.ConfigButton);
@@ -310,7 +311,7 @@ namespace GenericModConfigMenu
             // the texture.
             this.Helper.Events.GameLoop.UpdateTicking += this.FiveTicksAfterGameLaunched;
 
-            Api configMenu = new Api(ModManifest, this.ConfigManager, mod => this.OpenModMenu(mod, page: null, listScrollRow: null), mod => this.OpenModMenuNew(mod, page: null, listScrollRow: null), (s) => LogDeprecated( ModManifest.UniqueID, s));
+            Api configMenu = new(ModManifest, this.ConfigManager, mod => this.OpenModMenu(mod, page: null, listScrollRow: null), mod => this.OpenModMenuNew(mod, page: null, listScrollRow: null), (s) => LogDeprecated(ModManifest.UniqueID, s));
 
             configMenu.Register(
                 mod: this.ModManifest,
@@ -336,6 +337,33 @@ namespace GenericModConfigMenu
                 tooltip: I18n.Options_OpenMenuKey_Desc,
                 getValue: () => this.Config.OpenMenuKey,
                 setValue: value => this.Config.OpenMenuKey = value
+            );
+            configMenu.AddNumberOption(
+               mod: this.ModManifest,
+               name: I18n.Options_SearchOffSetX_Name,
+               tooltip: I18n.Options_SearchOffSetX_Desc,
+               getValue: () => this.Config.FilterOffsetX,
+               setValue: value => this.Config.FilterOffsetX = value,
+               min: -1000,
+               max: 1000,
+               formatValue: null
+           );
+            configMenu.AddNumberOption(
+                mod: this.ModManifest,
+                name: I18n.Options_SearchOffSetY_Name,
+                tooltip: I18n.Options_SearchOffSetY_Desc,
+                getValue: () => this.Config.FilterOffsetY,
+                setValue: value => this.Config.FilterOffsetY = value,
+                min: -1000,
+                max: 1000,
+                formatValue: null
+            );
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: I18n.Options_SearchAutoFocus_Name,
+                tooltip: I18n.Options_SearchAutoFocus_Desc,
+                getValue: () => this.Config.SearchBarAutoFocus,
+                setValue: value => this.Config.SearchBarAutoFocus = value
             );
         }
 
@@ -375,7 +403,7 @@ namespace GenericModConfigMenu
         /// <param name="e">The event arguments.</param>
         private void OnWindowResized(object sender, WindowResizedEventArgs e)
         {
-            if ( this.ConfigButton != null )
+            if (this.ConfigButton != null)
                 this.ConfigButton.LocalPosition = new Vector2(this.ConfigButton.Position.X, Game1.viewport.Height - 100);
         }
 

@@ -28,5 +28,11 @@
     "options.open-menu-key.name": "Open menu key",
     "options.open-menu-key.desc": "A keybind which opens the menu.",
     "options.scroll-speed.name": "Scroll speed",
-    "options.scroll-speed.desc": "The number of field rows to offset when scrolling a config menu."
+    "options.scroll-speed.desc": "The number of field rows to offset when scrolling a config menu.",
+    "options.searchAutoFocus.name": "Auto-focus Search Bar",
+    "options.searchAutoFocus.desc": "Whether to automatically focus the search bar when opening the config menu.",
+    "options.searchOffSetX.name": "Search bar OffsetX",
+    "options.searchOffSetX.desc": "The X offset of the search bar from the left side of the screen.",
+    "options.searchOffSetY.name": "Search bar OffsetY",
+    "options.searchOffSetY.desc": "The Y offset of the search bar from the top of the screen."
 }
