@@ -27,6 +27,11 @@ namespace GenericModConfigMenu.Framework
         /// <summary>Open the config UI for a specific mod.</summary>
         private readonly Action<IManifest, int> OpenModMenu;
 
+        /// <summary> Fields to allow using values when regenerating list</summary>
+        private readonly Action<int> OpenKeybindingsMenu;
+        private readonly Texture2D KeybindingsTex;
+        private readonly int? ScrollTo;
+
         private static bool InGame => Context.IsWorldReady;
 
         private readonly List<Label> LabelsWithTooltips = [];
@@ -66,10 +71,12 @@ namespace GenericModConfigMenu.Framework
         /// <param name="scrollTo">The initial scroll position, represented by the row index at the top of the visible area.</param>
         public ModConfigMenu(int scrollSpeed, Action<IManifest, int> openModMenu, Action<int> openKeybindingsMenu, ModConfigManager configs, Texture2D keybindingsTex, int? scrollTo = null,
             bool filterAutofocus = true, int filterPositionX = 0, int filterPositionY = 0)
-        public ModConfigMenu(int scrollSpeed, Action<IManifest, int> openModMenu, Action<int> openKeybindsMenu, ModConfigManager configs, Texture2D keybindsTexture, int? scrollTo = null)
         {
             this.ScrollSpeed = scrollSpeed;
             this.OpenModMenu = openModMenu;
+            this.OpenKeybindingsMenu = openKeybindingsMenu;
+            this.KeybindingsTex = keybindingsTex;
+            this.ScrollTo = scrollTo;
             this.FilterAutofocus = filterAutofocus;
             this.FilterPositionX = filterPositionX;
             this.FilterPositionY = filterPositionY;
@@ -124,7 +131,7 @@ namespace GenericModConfigMenu.Framework
                 this.FilterField.Value.OnEnterPressed += sender => sender.Selected = false;
                 this.FilterField.Value.OnTabPressed += sender => sender.Selected = false;
             }
-            var fieldPosition = new Vector2(this.FilterField.Value.Width / 2 + 128 + FilterPositionX, this.FilterField.Value.Height - 125 + FilterPositionY);
+            var fieldPosition = new Vector2(this.FilterField.Value.Width / 2 + 128 + this.FilterPositionX, this.FilterField.Value.Height - 125 + this.FilterPositionY);
             this.FilterField.Value.X = (int)(this.Table.LocalPosition.X - fieldPosition.X);
             this.FilterField.Value.Y = (int)(this.Table.LocalPosition.Y - fieldPosition.Y);
             this.FilterFieldBounds = new Rectangle(this.FilterField.Value.X, this.FilterField.Value.Y + 4, this.FilterField.Value.Width, 12 * Game1.pixelZoom);
@@ -169,9 +176,9 @@ namespace GenericModConfigMenu.Framework
             // non-editable mods heading
             {
                 ModConfig[] notEditable = configs
-                    .Where(entry => !entry.AnyEditableInGame && InGame)
-                    .OrderBy(entry => entry.ModName)
-                    .ToArray();
+                           .Where(entry => !entry.AnyEditableInGame && InGame)
+                           .OrderBy(entry => entry.ModName)
+                           .ToArray();
 
                 if (notEditable.Any())
                 {
@@ -203,10 +210,10 @@ namespace GenericModConfigMenu.Framework
 
             this.Ui.AddChild(this.Table);
 
-            var button = new Button(keybindsTexture)
+            var button = new Button(this.KeybindingsTex)
             {
-                LocalPosition = this.Table.LocalPosition - new Vector2( keybindsTexture.Width / 2 + 32, 0 ),
-                Callback = _ => openKeybindsMenu( this.ScrollRow),
+                LocalPosition = this.Table.LocalPosition - new Vector2(this.KeybindingsTex.Width / 2 + 32, 0),
+                Callback = _ => this.OpenKeybindingsMenu( this.ScrollRow),
             };
             this.Ui.AddChild(button);
 
@@ -215,8 +222,8 @@ namespace GenericModConfigMenu.Framework
             else
                 this.upperRightCloseButton = null;
 
-            if (scrollTo != null)
-                this.ScrollRow = scrollTo.Value;
+            if (this.ScrollTo != null)
+                this.ScrollRow = this.ScrollTo.Value;
 
             if (!InGame)
             {
