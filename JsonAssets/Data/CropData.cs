@@ -81,7 +81,7 @@ namespace JsonAssets.Data
                 RegrowDays = this.RegrowthPhase,
                 IsRaised = this.TrellisCrop,
                 IsPaddyCrop = this.CropType == CropType.Paddy,
-                HarvestItemId = "(O)" + this.Product.ToString().FixIdJA("O"),
+                HarvestItemId = this.getFixedProductName(),
                 HarvestMinStack = this.Bonus?.MinimumPerHarvest ?? 1,
                 HarvestMaxStack = this.Bonus?.MaximumPerHarvest ?? 1,
                 HarvestMaxIncreasePerFarmingLevel = this.Bonus?.MaxIncreasePerFarmLevel ?? 0,
@@ -97,14 +97,14 @@ namespace JsonAssets.Data
         {
             var giantData = new StardewValley.GameData.GiantCrops.GiantCropData()
             {
-                FromItemId = "(O)" + this.Product.ToString().FixIdJA("O"),
+                FromItemId = this.getFixedProductName(),
                 HarvestItems = new List<StardewValley.GameData.GiantCrops.GiantCropHarvestItemData> {
                     new StardewValley.GameData.GiantCrops.GiantCropHarvestItemData () {
                         Chance = 1.0f,
                         ScaledMinStackWhenShaving = 2,
                         ScaledMaxStackWhenShaving = 2,
-                        Id = "(O)" + this.Product.ToString().FixIdJA("O"),
-                        ItemId = "(O)" + this.Product.ToString().FixIdJA("O"),
+                        Id = this.getFixedProductName(),
+                        ItemId = this.getFixedProductName(),
                         MinStack = 15,
                         MaxStack = 21,
                         QualityModifierMode = StardewValley.GameData.QuantityModifier.QuantityModifierMode.Stack,
@@ -135,6 +135,28 @@ namespace JsonAssets.Data
             this.Seasons.FilterNulls();
             this.SeedPurchaseRequirements.FilterNulls();
             this.SeedAdditionalPurchaseData.FilterNulls();
+        }
+
+        private string getFixedProductName()
+        {
+            if (this.Product == null)
+            {
+                Log.Warn($"Null crop product detected");
+                return "";
+            }
+            else if (int.TryParse(this.Product.ToString(), out int productId) && StardewValley.ItemRegistry.Exists("(O)" + productId.ToString()))
+            {
+                return "(O)" + productId.ToString();
+            }
+            else if (this.Product.ToString().FixIdJA("O") != null)
+            {
+                return "(O)" + this.Product.ToString().FixIdJA("O");
+            }
+            else
+            {
+                Log.Warn($"Invalid crop product detected: {this.Product.ToString()}");
+                return this.Product.ToString();
+            }
         }
     }
 }

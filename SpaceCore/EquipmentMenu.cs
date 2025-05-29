@@ -28,7 +28,8 @@ namespace SpaceCore
             yPositionOnScreen -= 80;
             width += 80;
             height += 80;
-            
+            AllowExitWithHeldItem = true;
+
             int PerRow = 4;
             int amt = SpaceCore.EquipmentSlots.Count;
             int wamt = Math.Min(amt, PerRow);

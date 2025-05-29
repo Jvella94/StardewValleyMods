@@ -43,9 +43,9 @@ namespace GenericModConfigMenu.Framework
         private bool InGame => Context.IsWorldReady;
 
         /// <summary>The active keybind overlay, if any.</summary>
-        private IKeybindOverlay ActiveKeybindOverlay;
+        private KeybindOverlay ActiveKeybindOverlay;
 
-        /// <summary>Whether a keybinding UI is open.</summary>
+        /// <summary>Whether a keybind overlay is open.</summary>
         private bool IsBindingKey => this.ActiveKeybindOverlay != null;
 
         /// <summary>The current width of the title label.</summary>
@@ -61,13 +61,13 @@ namespace GenericModConfigMenu.Framework
         *********/
         public IManifest Manifest => this.ModConfig?.ModManifest;
         public readonly string CurrPage;
-        public bool IsKeybindingsPage => Manifest == null;
+        public bool IsKeybindsPage => Manifest == null;
 
 
         /*********
         ** Public methods
         *********/
-        // This is the keybindings menu constructor
+        // This is the keybinds menu constructor
         public SpecificModConfigMenu(ModConfigManager mods, int scrollSpeed, Action returnToList)
         {
             ConfigsForKeybinds = mods;
@@ -167,7 +167,7 @@ namespace GenericModConfigMenu.Framework
             // We need to update widgets at least once so ComplexModOptionWidget's get initialized
             this.Table.ForceUpdateEvenHidden();
 
-            RefreshKeybindingColor();
+            RefreshKeybindColor();
         }
 
         public SpecificModConfigMenu(ModConfig config, int scrollSpeed, string page, Action<string> openPage, Action returnToList)
@@ -598,7 +598,7 @@ namespace GenericModConfigMenu.Framework
                 string pageTitle = modManifest == null ? "" : this.ModConfig.Pages[this.CurrPage].PageTitle();
                 var titleLabel = new Label
                 {
-                    String = modManifest == null ? I18n.List_Keybindings() : (modManifest.Name + (pageTitle == "" ? "" : " > " + pageTitle)),
+                    String = modManifest == null ? I18n.List_Keybinds() : (modManifest.Name + (pageTitle == "" ? "" : " > " + pageTitle)),
                     Bold = true
                 };
                 titleLabel.LocalPosition = new Vector2((Game1.uiViewport.Width - titleLabel.Measure().X) / 2, 12 + 32);
@@ -765,7 +765,34 @@ namespace GenericModConfigMenu.Framework
         private void ShowKeybindOverlay<TKeybind>(SimpleModOption<TKeybind> option, Label label)
         {
             Game1.playSound("breathin");
-            this.ActiveKeybindOverlay = new KeybindOverlay<TKeybind>(option, label);
+
+            this.ActiveKeybindOverlay = option switch
+            {
+                SimpleModOption<SButton> buttonOption => new KeybindOverlay(
+                    keybinds: [new Keybind(buttonOption.Value)],
+                    onlyAllowSingleButton: true,
+                    name: option.Name(),
+                    onSaved: keybinds =>
+                    {
+                        buttonOption.Value = keybinds.FirstOrDefault()?.Buttons.FirstOrDefault(SButton.None) ?? SButton.None;
+                        label.String = option.FormatValue();
+                    }
+                ),
+
+                SimpleModOption<KeybindList> listOption => new KeybindOverlay(
+                    keybinds: listOption.Value.Keybinds,
+                    onlyAllowSingleButton: false,
+                    name: option.Name(),
+                    onSaved: keybinds =>
+                    {
+                        listOption.Value = new KeybindList(keybinds);
+                        label.String = option.FormatValue();
+                    }
+                ),
+
+                _ => throw new InvalidOperationException($"Unsupported keybind type {typeof(TKeybind).FullName}.")
+            };
+
             this.Ui.Obscured = true;
         }
 
@@ -775,12 +802,12 @@ namespace GenericModConfigMenu.Framework
             this.ActiveKeybindOverlay = null;
             this.Ui.Obscured = false;
 
-            RefreshKeybindingColor();
+            RefreshKeybindColor();
         }
 
-        private void RefreshKeybindingColor()
+        private void RefreshKeybindColor()
         {
-            if (IsKeybindingsPage)
+            if (IsKeybindsPage)
             {
                 Dictionary<string, int> keybinds = new();
                 foreach (var opt in keybindOpts)

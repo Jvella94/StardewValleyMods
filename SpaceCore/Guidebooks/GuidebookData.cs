@@ -1,11 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using StardewValley;
-using StardewValley.Menus;
 
 namespace SpaceCore.Guidebooks;
 public class GuidebookData
@@ -25,7 +20,7 @@ public class GuidebookData
         public int TabIconScale { get; set; } = Game1.pixelZoom;
         public string Condition { get; set; } = "TRUE";
 
-        public List<PageData> Pages { get; }= new();
+        public List<PageData> Pages { get; set; } = new();
     }
 
     public string Title { get; set; }
@@ -33,5 +28,5 @@ public class GuidebookData
     public Vector2 PagePadding { get; set; } = new(28, 28);
     public Vector2 PageSize { get; set; } = new(600, 500); // Only used if PageTexture is null
     public string DefaultChapter { get; set; }
-    public Dictionary<string, ChapterData> Chapters { get; } = new();
+    public Dictionary<string, ChapterData> Chapters { get; set; } = new();
 }

@@ -17,6 +17,6 @@ internal static class AssetManager
         if (e.Name.IsEquivalentTo(ConfigButton))
             e.LoadFromModFile<Texture2D>("assets/config-button.png", AssetLoadPriority.Exclusive);
         else if (e.Name.IsEquivalentTo(KeyboardButton))
-            e.LoadFromModFile<Texture2D>("assets/keybindings-button.png", AssetLoadPriority.Exclusive);
+            e.LoadFromModFile<Texture2D>("assets/keybinds-button.png", AssetLoadPriority.Exclusive);
     }
 }

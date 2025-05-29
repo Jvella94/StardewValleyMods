@@ -252,6 +252,7 @@ Provided functionality for content pack authors:
         * Example (for Content Patcher): `"{{InternalAssetKey: assets/prismatic.png}}:0@5,1@5,2@5,3@5,4@5,5@5`
         * Another way of doing the above is using `..` to specify a sequence of frames that all get the same duration: `{{InternalAssetKey: assets/prismatic.png}}:0..5@5`
     * `SourceSizeOverride` - A Vector2 size. If specified, the sprite size to use for frames in `SourceTexture` (normally the size is the same as the size in `TargetRect`). This allows you to fit a larger image in place of a smaller vanilla image. (For example, fitting a 256x256 portrait into the default 64x64 spaces.)
+    * `ChancePerTick` - The percent chance for an animation, in a range of 0 to 1 (ex. `0.10` = 10% chance per tick). This is the chance for the animation to *start when no animation is active*. If an animation has already been triggered, this value is ignored until the animation is finished.
 * NPC Questions - Previously part of [Backstory Questions Framework](https://www.nexusmods.com/stardewvalley/mods/14451):
     * To edit the questions you can ask someone, edit the `spacechase0.SpaceCore/Questions` asset, which is a dictionary with the NPC name for the key, and the value being a list of objects with the following values:
         * `ID` - Required, must be unique, doesn't show to end users

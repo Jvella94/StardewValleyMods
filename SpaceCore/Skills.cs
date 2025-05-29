@@ -253,6 +253,15 @@ namespace SpaceCore
             BarsApi = SpaceCore.Instance.Helper.ModRegistry.GetApi<IExperienceBarsApi>("spacechase0.ExperienceBars");
             if (BarsApi is not null)
                 events.Display.RenderedHud += Skills.OnRenderedHud;
+
+            var BetterGameMenuApi = SpaceCore.Instance.Helper.ModRegistry.GetApi<IBetterGameMenuApi>("leclair.bettergamemenu");
+            BetterGameMenuApi?.RegisterImplementation(
+                id: nameof(BetterGameMenuTabs.Skills),
+                priority: 100,
+                getPageInstance: menu => new NewSkillsPage(menu.xPositionOnScreen, menu.yPositionOnScreen, menu.width, menu.height),
+                getWidth: width => width + (LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.ru ? 64 : 0),
+                onResize: input => new NewSkillsPage(input.Menu.xPositionOnScreen, input.Menu.yPositionOnScreen, input.Menu.width, input.Menu.height)
+            );
         }
 
         private static void GameLoop_ReturnedToTitle(object sender, ReturnedToTitleEventArgs e)

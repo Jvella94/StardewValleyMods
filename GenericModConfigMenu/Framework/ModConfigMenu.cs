@@ -60,10 +60,13 @@ namespace GenericModConfigMenu.Framework
         /// <summary>Construct an instance.</summary>
         /// <param name="scrollSpeed">The number of field rows to offset when scrolling a config menu.</param>
         /// <param name="openModMenu">Open the config UI for a specific mod.</param>
+        /// <param name="openKeybindsMenu">Open the menu to configure mod keybinds.</param>
+        /// <param name="keybindsTexture">The icon texture for the keybinds menu.</param>
         /// <param name="configs">The mod configurations to display.</param>
         /// <param name="scrollTo">The initial scroll position, represented by the row index at the top of the visible area.</param>
         public ModConfigMenu(int scrollSpeed, Action<IManifest, int> openModMenu, Action<int> openKeybindingsMenu, ModConfigManager configs, Texture2D keybindingsTex, int? scrollTo = null,
             bool filterAutofocus = true, int filterPositionX = 0, int filterPositionY = 0)
+        public ModConfigMenu(int scrollSpeed, Action<IManifest, int> openModMenu, Action<int> openKeybindsMenu, ModConfigManager configs, Texture2D keybindsTexture, int? scrollTo = null)
         {
             this.ScrollSpeed = scrollSpeed;
             this.OpenModMenu = openModMenu;
@@ -192,10 +195,33 @@ namespace GenericModConfigMenu.Framework
                             HoverTextColor = Color.Black * 0.4f
                         };
 
-                        this.Table.AddRow([label]);
-                        this.LabelsWithTooltips.Add(label);
+                        this.Table.AddRow(new Element[] { label });
+                        LabelsWithTooltips.Add(label);
                     }
                 }
+            }
+
+            this.Ui.AddChild(this.Table);
+
+            var button = new Button(keybindsTexture)
+            {
+                LocalPosition = this.Table.LocalPosition - new Vector2( keybindsTexture.Width / 2 + 32, 0 ),
+                Callback = _ => openKeybindsMenu( this.ScrollRow),
+            };
+            this.Ui.AddChild(button);
+
+            if (Constants.TargetPlatform == GamePlatform.Android)
+                this.initializeUpperRightCloseButton();
+            else
+                this.upperRightCloseButton = null;
+
+            if (scrollTo != null)
+                this.ScrollRow = scrollTo.Value;
+
+            if (!InGame)
+            {
+                // This hack lets gamepad cursor movement work without a harmony patch
+                Mod.instance.Helper.Reflection.GetField<bool>(Game1.activeClickableMenu, "titleInPosition").SetValue(false);
             }
         }
 

@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 using SpaceShared;
+using SpaceShared.APIs;
 using SpaceShared.UI;
 
 using StardewModdingAPI;
@@ -154,10 +155,11 @@ namespace GenericModConfigMenu
         {
             Mod.ActiveConfigMenu = new ModConfigMenu(this.Config.ScrollSpeed, openModMenu: (mod, curScrollRow) => this.OpenModMenuNew(mod, page: null, listScrollRow: curScrollRow), openKeybindingsMenu: currScrollRow => OpenKeybindingsMenuNew(currScrollRow),
                 this.ConfigManager, this.Helper.GameContent.Load<Texture2D>(AssetManager.KeyboardButton), scrollRow, Config.SearchBarAutoFocus, Config.FilterOffsetX, Config.FilterOffsetY);
+            Mod.ActiveConfigMenu = new ModConfigMenu(this.Config.ScrollSpeed, openModMenu: (mod, curScrollRow) => this.OpenModMenuNew(mod, page: null, listScrollRow: curScrollRow), openKeybindsMenu: currScrollRow => OpenKeybindsMenuNew( currScrollRow ), this.ConfigManager, this.Helper.GameContent.Load<Texture2D>(AssetManager.KeyboardButton), scrollRow);
         }
         private void OpenListMenu(int? scrollRow = null)
         {
-            var newMenu = new ModConfigMenu(this.Config.ScrollSpeed, openModMenu: (mod, curScrollRow) => this.OpenModMenuNew(mod, page: null, listScrollRow: curScrollRow), openKeybindingsMenu: currScrollRow => OpenKeybindingsMenuNew(currScrollRow), this.ConfigManager, this.Helper.GameContent.Load<Texture2D>(AssetManager.KeyboardButton), scrollRow); ;
+            var newMenu = new ModConfigMenu(this.Config.ScrollSpeed, openModMenu: (mod, curScrollRow) => this.OpenModMenuNew(mod, page: null, listScrollRow: curScrollRow), openKeybindsMenu: currScrollRow => OpenKeybindsMenuNew(currScrollRow), this.ConfigManager, this.Helper.GameContent.Load<Texture2D>(AssetManager.KeyboardButton), scrollRow); ;
             if (Game1.activeClickableMenu is TitleMenu)
             {
                 TitleMenu.subMenu = newMenu;
@@ -168,7 +170,7 @@ namespace GenericModConfigMenu
             }
         }
 
-        private void OpenKeybindingsMenuNew(int listScrollRow)
+        private void OpenKeybindsMenuNew(int listScrollRow)
         {
             Mod.ActiveConfigMenu = new SpecificModConfigMenu(
                 mods: this.ConfigManager,
@@ -183,7 +185,7 @@ namespace GenericModConfigMenu
             );
         }
 
-        private void OpenKeybindingsMenu(int listScrollRow)
+        private void OpenKeybindsMenu(int listScrollRow)
         {
             var newMenu = new SpecificModConfigMenu(
                 mods: this.ConfigManager,
@@ -365,6 +367,18 @@ namespace GenericModConfigMenu
                 getValue: () => this.Config.SearchBarAutoFocus,
                 setValue: value => this.Config.SearchBarAutoFocus = value
             );
+
+            var BetterGameMenu = this.Helper.ModRegistry.GetApi<IBetterGameMenuApi>("leclair.bettergamemenu");
+            BetterGameMenu?.OnTabContextMenu(evt =>
+            {
+                if (evt.Tab == nameof(BetterGameMenuTabs.Options))
+                    evt.Entries.Add(evt.CreateEntry(I18n.Button_ModOptions(), () => this.OpenListMenuNew(), null));
+            });
+            BetterGameMenu?.OnPageCreated(evt =>
+            {
+                if (evt.Tab == nameof(BetterGameMenuTabs.Options) && evt.Page is OptionsPage page)
+                    page.options.Add(new OptionsButton(I18n.Button_ModOptions(), () => this.OpenListMenuNew()));
+            });
         }
 
         private void FiveTicksAfterGameLaunched(object sender, UpdateTickingEventArgs e)
@@ -447,7 +461,7 @@ namespace GenericModConfigMenu
         /// <param name="e">The event arguments.</param>
         private void OnButtonChanged(object sender, ButtonsChangedEventArgs e)
         {
-            // pass to menu for keybinding
+            // pass to menu for keybind
             if (Mod.ActiveConfigMenu is SpecificModConfigMenu menu)
                 menu.OnButtonsChanged(e);
         }

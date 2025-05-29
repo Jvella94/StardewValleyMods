@@ -4,7 +4,7 @@ using StardewModdingAPI.Utilities;
 
 namespace GenericModConfigMenu.Framework.ModOption
 {
-    /// <summary>A mod option which renders a basic form input (e.g. a checkbox, textbox, or key binding).</summary>
+    /// <summary>A mod option which renders a basic form input (e.g. a checkbox, textbox, or keybind).</summary>
     internal class SimpleModOption<T> : BaseModOption
     {
         /*********

@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -30,7 +27,7 @@ namespace SpaceCore.VanillaAssetExpansion
             public Rectangle IconRect { get; set; }
             public string FilterCondition { get; set; } = "TRUE";
         }
-        public List<CustomTab> CustomTabs { get; } = new List<CustomTab>();
+        public List<CustomTab> CustomTabs { get; set; } = new List<CustomTab>();
     }
 
     [HarmonyPatch(typeof(ShopMenu), nameof(ShopMenu.setUpStoreForContext))]

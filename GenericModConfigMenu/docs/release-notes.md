@@ -5,7 +5,7 @@
 * Fix crash when hovering over mod with null tooltip.
 
 ## 1.9.0
-* Added keybindings menu (icon thanks to mistyspring!).
+* Added keybinds menu (icon thanks to mistyspring!).
 * Added description tooltip for mods on mod list menu.
 
 ## 1.8.2
@@ -122,7 +122,7 @@ Released 27 March 2021 for Stardew Valley 1.5.
 ## 1.3.2
 Released 16 March 2021 for Stardew Valley 1.5.
 
-* Added partial support for `KeybindingList` options.
+* Added partial support for `KeybindList` options.
 
 ## 1.3.1
 Released 04 March 2021 for Stardew Valley 1.5.
