@@ -16,7 +16,7 @@
 
   <!--import mod build package-->
   <ItemGroup>
-    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.2-casey" />
+    <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.2.0" />
     <PackageReference Include="Leclair.Stardew.ModManifestBuilder" Version="2.4.0" />
   </ItemGroup>
 
